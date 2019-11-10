@@ -1,0 +1,77 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: update packages
+      apt:
+        name: "{{ java }}"
+        update_cache: yes
+        state: present
+      when: ansible_os_family == "Debian"
+    - name: installing java
+      package:
+        name: "{{ java }}"
+        state: present
+      when: ansible_os_family == "RHEL"
+    - name: install wget
+      package:
+        name: wget
+        state: present
+      when: ansible_os_family == "RHEL"
+      notfiy:
+        - unarchive war
+      when: ansible_os_family == "RHEL"
+    - name: tomcat8 installing
+      package:
+        name: tomcat8
+        state: present
+      when: ansible_os_family == "Debian"
+      notfiy:
+        - restart service
+    - name: 
+      package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ tomcat_packages }}"
+    - name:
+      template:
+        src: templates/tomcat-users.xml.j2
+        dest: /var/lib/tomcat8/conf/tomcat-users.xml
+    - name: copy war file into tomcat
+      get_url:
+        url: "{{ war_location }}"
+        dest: "/var/lib/tomcat8/webapps/{{ war_file_name }}"
+      notfiy:
+        - restart service
+  
+  handlers:
+  - name: restart service
+    service:
+      name: tomcat8
+      state: restart
+ - name: unarchive war
+   command: wget https://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.37/bin/apache-tomcat-8.5.37.tar.gz
+
+
+
+# ubuntu
+# sudo apt-get update
+# sudo apt-get install openjdk-8-jdk
+# sudo apt-get install tomcat8 
+# restar service
+# sudo apt-get tomcat8-docs
+# sudo apt-get tomcat8-examples
+# sudo apt-get tomcat8-admin
+# sudo nano /opt/tomcat/conf/tomcat-users.xml
+# tomcat-users.xml enter some data
+# sudo service tomca8 restart
+
+# Centos
+# sudo yum update
+# sudo yum install java-1.7.0-openjdk-devel
+# sudo yum install tomcat8
+# sudo yum install tomcat8-docs
+# sudo yum install  tomcat8-examples
+# sudo yum install tomcat8-admin
+# sudo vi /opt/tomcat/conf/tomcat-users.xml
+# sudo systemctl restart tomcat.service

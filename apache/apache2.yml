@@ -1,0 +1,32 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: update
+    apt:
+      name: apache2
+      update_cache: yes 
+    when: ansible_os_family == "Debian" 
+  - name: update&install 
+    package:
+      name: "{{ package_apache }}"
+      state: present
+  - name: enable service
+    service: 
+      name: "{{package_apache}}"
+      enabled: yes
+      state: started
+
+# sudo apt-get update 
+# sudo apt-get install apache2
+# sudo service apache2 start
+# hhtp://<publicipaddress>
+# inventory file
+ 
+redhat 8
+# yum install httpd
+# systemctl enable httpd
+# yum install php php-mysqlnd php-pdo php-gd php-mbstring
+# systemctl restart httpd 
+# echo "<?php phpinfo() ?>" > /var/www/html/info.php
+#  http://localhost/info.php

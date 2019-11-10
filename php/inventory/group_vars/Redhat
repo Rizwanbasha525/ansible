@@ -1,0 +1,14 @@
+package_apache: httpd
+php_packages:
+  - php
+  - php-pdo
+  - php-gd
+  - php-mbstring
+
+~
+~
+~
+~
+~
+~
+
